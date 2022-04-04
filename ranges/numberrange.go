@@ -60,18 +60,7 @@ func (nr NumberRange[P]) Intersect(other NumberRange[P]) (bool, NumberRange[P]) 
 }
 
 func (nr NumberRange[P]) IntersectOthers(others []NumberRange[P]) (bool, NumberRange[P]) {
-	/*
-		var result NumberRange[P] = nr
-		var isAllIntersected, intersected bool = true, true
-		if len(others) == 0 {
-			return isAllIntersected, result
-		}
-		for _, other := range others {
-			intersected, result = result.Intersect(other)
-			isAllIntersected = isAllIntersected && intersected
-		}
-		return isAllIntersected, result
-	*/
+
 	var rgThis Range[P, NumberRange[P]] = nr
 	return IntersectOthers(rgThis, others)
 }
@@ -83,20 +72,6 @@ func (nr NumberRange[P]) Union(other NumberRange[P]) (bool, NumberRange[P]) {
 }
 
 func (nr NumberRange[P]) UnionOthers(others []NumberRange[P]) (bool, NumberRange[P]) {
-	/*
-		var result NumberRange[P] = nr
-		var isAllSuccessive, successived bool = true, true
-		if len(others) == 0 {
-			return true, result
-		}
-		for _, other := range others {
-			successived, result = result.Union(other)
-			if successived == false {
-				isAllSuccessive = false
-			}
-		}
-		return isAllSuccessive, result
-	*/
 	var rgThis Range[P, NumberRange[P]] = nr
 	return UnionOthers(rgThis, others)
 

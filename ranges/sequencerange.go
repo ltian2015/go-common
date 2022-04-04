@@ -2,10 +2,9 @@ package ranges
 
 import (
 	"fmt"
-	"time"
 )
 
-// Sequencable约束中，类型参数S是指符合Sequencable接口要求的类型本身，
+//Sequencable约束中，类型参数S是指符合Sequencable接口要求的类型本身，
 //也就是S==any Type impl Sequencable, 二者类型完全相同,S==Sequencable[S]
 //这样写，是由于GO不支持嵌套的类型参数定义，无法写Sequencable [S Sequencable[any]]，
 // 所以用S any类型代表所有符合Sequencable约束的类型。
@@ -16,20 +15,6 @@ type Sequencable[S any] interface {
 	Before(s S) bool
 	After(s S) bool
 }
-type TimeInterval = SeqRange[time.Time, time.Time]
-type MyTime time.Time
-
-func (mt MyTime) Before(other MyTime) bool {
-	return mt.Before(other)
-}
-func (mt MyTime) After(other MyTime) bool {
-	return mt.After(other)
-}
-func (mt MyTime) Equal(other MyTime) bool {
-	return mt.Equal(other)
-}
-
-type MyTimeInterval = SeqRange[MyTime, MyTime]
 
 //CreateSeqRange函数用于创建一个
 //在类型上，P==T
@@ -87,16 +72,8 @@ func (sr SeqRange[P, T]) Intersect(other SeqRange[P, T]) (bool, SeqRange[P, T]) 
 }
 
 func (sr SeqRange[P, T]) IntersectOthers(others []SeqRange[P, T]) (bool, SeqRange[P, T]) {
-	var result SeqRange[P, T] = sr
-	var isAllIntersected, intersected bool = true, true
-	if len(others) == 0 {
-		return isAllIntersected, result
-	}
-	for _, other := range others {
-		intersected, result = result.Intersect(other)
-		isAllIntersected = isAllIntersected && intersected
-	}
-	return isAllIntersected, result
+	var rgThis Range[P, SeqRange[P, T]] = sr
+	return IntersectOthers(rgThis, others)
 }
 
 func (sr SeqRange[P, T]) Union(other SeqRange[P, T]) (bool, SeqRange[P, T]) {
@@ -106,18 +83,8 @@ func (sr SeqRange[P, T]) Union(other SeqRange[P, T]) (bool, SeqRange[P, T]) {
 }
 
 func (sr SeqRange[P, T]) UnionOthers(others []SeqRange[P, T]) (bool, SeqRange[P, T]) {
-	var result SeqRange[P, T] = sr
-	var isAllSuccessive, successived bool = true, true
-	if len(others) == 0 {
-		return true, result
-	}
-	for _, other := range others {
-		successived, result = result.Union(other)
-		if successived == false {
-			isAllSuccessive = false
-		}
-	}
-	return isAllSuccessive, result
+	var rgThis Range[P, SeqRange[P, T]] = sr
+	return UnionOthers(rgThis, others)
 }
 func (sr SeqRange[P, T]) IsBefore(other SeqRange[P, T]) bool {
 	var rgThis Range[P, SeqRange[P, T]] = sr
