@@ -1,32 +1,16 @@
 package ranges
 
-//以“类型集合”的形式定义了一个接口。
+import "fmt"
 
-type number interface {
-	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~float32 | ~float64 |
-		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64
-}
-
-// Sequencable约束中，类型参数S是指符合Sequencable接口要求的类型本身，
-//也就是S==any Type impl Sequencable, 二者类型完全相同,S==Sequencable[S]
-//这样写，是由于GO不支持嵌套的类型参数定义，无法写Sequencable [S Sequencable[any]]，
-// 所以用S any类型代表所有符合Sequencable约束的类型。
-// 因而，对于任何满足Sequencable[S]的具体类型的值sq ,则 s S=(interface{})(sq).(S)都是安全的类型转换。
-type Sequencable[S any] interface {
-	comparable //Range 接口要求类型参数必须是可比较的类型。需要在可比较类型基础上增加三个方法约束即可。
-	Equal(s S) bool
-	Before(s S) bool
-	After(s S) bool
-}
-
-//Range接口中，类型参数P是构成Range起点与终点的类型
-//而R则表示所有用P类型作为起点与终点类型，实现了Range接口的类型。
-//也就是 R= any Type impl Range[P]，二者类型完全相同,R==Range[P,R]
+//Range是指是由类型参数P的值作为起点和终点（不包括在内）的左闭右开区间。
+//数据结构形如，struct {start P,end P},数学表示形式如， [start,end)
+//从数学上讲，start永远小于end，end永远在start之后，如果二者相等，区间实际上就是一个点。
+//Range接口中，类型参数P是构成Range起点与终点的类型,而类型参数R则Range自身类型。
+//也就是二者类型完全相同,R==Range[P,R]。
 //这样写，是由于GO不支持嵌套的类型参数定义，无法写Range[P comparable,Range[any]]，
-//所有用R来代替Range[P]，但是泛型类型不允许直接使用类型断言,比如，r T=P.(T)
-//因而，对于任何满足Range[P]的具体类型的值rp，则 r R=(interface{})(rp).(R)都是安全的类型转换。
-//反之，对于任何满足R[P]的具体类型的值r，则 rp Range[P]=(interface{})(r).(Range[P])都是安全的类型转换。
-//
+//所有用R来代替Range[P,R]，但是泛型类型不允许直接使用类型断言,比如，r T=P.(T)
+//因而，对于任何满足Range[P，R]的具体类型的值rp，则 r R=(interface{})(rp).(R)都是安全的类型转换。
+//反之，对于任何满足R[P]的具体类型的值r，则 rp Range[P,R]=(interface{})(r).(Range[P,R])都是安全的类型转换。
 type Range[P comparable, R any] interface {
 	//以下方法需要实现者依靠自己去实现
 	Range(start, end P) R
@@ -46,8 +30,15 @@ type Range[P comparable, R any] interface {
 	IsAfter(other R) bool
 }
 
+//typeTo函数将给定源类型S的值s，转换目标类型D的值。
+//由于range包中，需要转换的两个参数类型实际应用中都会被赋予相同的类型，所以使用typeTo是安全的。
+func typeTo[S, D any](s S) D {
+	return (interface{})(s).(D)
+}
+
 ///////////////////下面是ranges包提供的辅助函数,可以帮助接口的实现者快速实现功能/////////////////////////
 //IsIntersected函数判断this h与other是否相交
+//两个区间相交，那么必须有
 func IsIntersected[P comparable, R any](this, other Range[P, R]) bool {
 	thisStart, thisEnd := this.DeRange()
 	otherStart, otherEnd := other.DeRange()
@@ -56,6 +47,9 @@ func IsIntersected[P comparable, R any](this, other Range[P, R]) bool {
 		thisStart != otherEnd && otherStart != thisEnd
 	return isIntersected
 }
+
+//IsPoint函数判断给定的区间值r是否是一个点。
+//如果给定区间值r的起点与终点相等，则返回true,否则返回false
 func IsPoint[P comparable, R any](r Range[P, R]) bool {
 	start, end := r.DeRange()
 	return start == end
@@ -198,4 +192,9 @@ func IsBefore[P comparable, R any](this, other Range[P, R]) bool {
 func IsAfter[P comparable, R any](this, other Range[P, R]) bool {
 	_, otherEnd := other.DeRange()
 	return this.IsAfterPoint(otherEnd)
+}
+
+func ToString[P comparable, R any](r Range[P, R]) string {
+	start, end := r.DeRange()
+	return fmt.Sprintf("[%v,%v)", start, end)
 }

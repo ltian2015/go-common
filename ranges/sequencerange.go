@@ -5,6 +5,17 @@ import (
 	"time"
 )
 
+// Sequencable约束中，类型参数S是指符合Sequencable接口要求的类型本身，
+//也就是S==any Type impl Sequencable, 二者类型完全相同,S==Sequencable[S]
+//这样写，是由于GO不支持嵌套的类型参数定义，无法写Sequencable [S Sequencable[any]]，
+// 所以用S any类型代表所有符合Sequencable约束的类型。
+// 因而，对于任何满足Sequencable[S]的具体类型的值sq ,则 s S=(interface{})(sq).(S)都是安全的类型转换。
+type Sequencable[S any] interface {
+	comparable //Range 接口要求类型参数必须是可比较的类型。需要在可比较类型基础上增加三个方法约束即可。
+	Equal(s S) bool
+	Before(s S) bool
+	After(s S) bool
+}
 type TimeInterval = SeqRange[time.Time, time.Time]
 type MyTime time.Time
 
@@ -29,11 +40,6 @@ func CreateSeqRange[P Sequencable[T], T any](p1, p2 P) SeqRange[P, T] {
 	} else {
 		return SeqRange[P, T]{start: p2, end: p1}
 	}
-}
-
-//这里的S，D在类型上永远相等，所以typeTo是安全的。
-func typeTo[S, D any](s S) D {
-	return (interface{})(s).(D)
 }
 
 type SeqRange[P Sequencable[T], T any] struct {
