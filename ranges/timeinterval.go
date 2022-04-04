@@ -3,16 +3,18 @@ package ranges
 import "time"
 
 type TimeInterval = SeqRange[time.Time, time.Time]
-type MyTime time.Time
 
-func (mt MyTime) Before(other MyTime) bool {
-	return mt.Before(other)
-}
-func (mt MyTime) After(other MyTime) bool {
-	return mt.After(other)
-}
-func (mt MyTime) Equal(other MyTime) bool {
-	return mt.Equal(other)
+func CreateTimeInterval(t1, t2 time.Time) TimeInterval {
+	return CreateSeqRange[time.Time, time.Time](t1, t2)
 }
 
-type MyTimeInterval = SeqRange[MyTime, MyTime]
+func Tintvl2Str(ti TimeInterval) string {
+	var layout = "2006-01-02 15:04:05"
+	return FmtTintvl(ti, layout)
+}
+func FmtTintvl(ti TimeInterval, layout string) string {
+	var f = func(t time.Time) string {
+		return t.Format(layout)
+	}
+	return RngToStr[time.Time, TimeInterval](ti, f)
+}

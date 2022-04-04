@@ -1,7 +1,5 @@
 package ranges
 
-import "fmt"
-
 type number interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~float32 | ~float64 |
 		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64
@@ -44,7 +42,7 @@ func (nr NumberRange[P]) IsAfterPoint(p P) bool {
 }
 
 func (nr NumberRange[P]) String() string {
-	return fmt.Sprintf("NumberRange[%v,%v)", nr.start, nr.end)
+	return RngToStr[P, NumberRange[P]](nr, v2s[P])
 }
 
 func (nr NumberRange[P]) IsIntersected(other NumberRange[P]) bool {

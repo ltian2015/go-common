@@ -1,9 +1,5 @@
 package ranges
 
-import (
-	"fmt"
-)
-
 //Sequencable约束中，类型参数S是指符合Sequencable接口要求的类型本身，
 //也就是S==any Type impl Sequencable, 二者类型完全相同,S==Sequencable[S]
 //这样写，是由于GO不支持嵌套的类型参数定义，无法写Sequencable [S Sequencable[any]]，
@@ -56,7 +52,7 @@ func (sr SeqRange[P, T]) IsAfterPoint(p P) bool {
 }
 
 func (sr SeqRange[P, T]) String() string {
-	return fmt.Sprintf("NumberRange[%v,%v)", sr.start, sr.end)
+	return RngToStr[P, SeqRange[P, T]](sr, v2s[P])
 }
 
 func (sr SeqRange[P, T]) IsIntersected(other SeqRange[P, T]) bool {

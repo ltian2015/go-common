@@ -60,13 +60,23 @@ func TestGenericNumberRange(t *testing.T) {
 func TestSequenceRange(t *testing.T) {
 	var t1 = time.Now()
 	var t2 = t1.Add(24 * time.Hour)
-	var ti1 TimeInterval = CreateSeqRange[time.Time, time.Time](t2, t1)
-	var ti2 TimeInterval = CreateSeqRange[time.Time, time.Time](t1, t1)
-	println(t1.String())
-	println(t2.String())
-	println(ti1.start.String())
-	println(ti1.end.String())
-	println(ti1.IsPoint())
-	println(ti2.IsPoint())
+	var t3 = t1.Add(36 * time.Hour)
+	var t4 = t1.Add(48 * time.Hour)
+
+	var ti1 TimeInterval = CreateTimeInterval(t1, t2)
+	var ti2 TimeInterval = CreateTimeInterval(t1, t3)
+	var ti3 TimeInterval = CreateTimeInterval(t3, t4)
+	var ti4 TimeInterval = CreateSeqRange[time.Time, time.Time](t1, t4)
+	var yes bool
+	var resultTi TimeInterval
+	yes, resultTi = ti1.Intersect(ti2)
+	println(Tintvl2Str(ti1), "+", Tintvl2Str(ti2), "=", Tintvl2Str(resultTi), yes)
+	yes, resultTi = ti1.Intersect(ti3)
+	println(Tintvl2Str(ti1), "+", Tintvl2Str(ti3), "=", Tintvl2Str(resultTi), yes)
+
+	yes, resultTi = ti1.Intersect(ti4)
+	println(Tintvl2Str(ti1), "+", Tintvl2Str(ti4), "=", Tintvl2Str(resultTi), yes)
+	yes, resultTi = ti2.Intersect(ti3)
+	println(Tintvl2Str(ti2), "+", Tintvl2Str(ti3), "=", Tintvl2Str(resultTi), yes)
 
 }

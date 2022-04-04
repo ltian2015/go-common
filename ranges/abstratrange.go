@@ -35,6 +35,9 @@ type Range[P comparable, R any] interface {
 func typeTo[S, D any](s S) D {
 	return (interface{})(s).(D)
 }
+func v2s[V any](v V) string {
+	return fmt.Sprintf("%v", v)
+}
 
 ///////////////////下面是ranges包提供的辅助函数,可以帮助接口的实现者快速实现功能/////////////////////////
 //IsIntersected函数判断this h与other是否相交
@@ -194,7 +197,7 @@ func IsAfter[P comparable, R any](this, other Range[P, R]) bool {
 	return this.IsAfterPoint(otherEnd)
 }
 
-func ToString[P comparable, R any](r Range[P, R]) string {
+func RngToStr[P comparable, R any](r Range[P, R], f func(P) string) string {
 	start, end := r.DeRange()
-	return fmt.Sprintf("[%v,%v)", start, end)
+	return "[" + f(start) + "," + f(end) + ")"
 }
