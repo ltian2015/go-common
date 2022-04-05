@@ -5,6 +5,8 @@ type number interface {
 		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64
 }
 
+//CreateNumberRange函数用于给定的两个点创建一个区间，
+//无论两个点的大小顺序如何，创建出来的区间的起点都会小于终点。
 func CreateNumberRange[P number](p1, p2 P) NumberRange[P] {
 	if p1 <= p2 {
 		return NumberRange[P]{start: p1, end: p2}
@@ -14,6 +16,8 @@ func CreateNumberRange[P number](p1, p2 P) NumberRange[P] {
 
 }
 
+//NumberRange[P number] 定义了各种数字类型元素组成的区间类型，该类型的区间
+//满足Range[P, NumberRange[P]接口。
 type NumberRange[P number] struct {
 	start P
 	end   P
@@ -28,9 +32,6 @@ func (nr NumberRange[P]) DeRange() (start, end P) {
 	return nr.start, nr.end
 }
 
-func (nr NumberRange[P]) IsPoint() bool {
-	return nr.start == nr.end
-}
 func (nr NumberRange[P]) IsIncludedPoint(p P) bool {
 	return p >= nr.start && p < nr.end
 }
@@ -41,46 +42,43 @@ func (nr NumberRange[P]) IsAfterPoint(p P) bool {
 	return p < nr.start
 }
 
+///////////////////////////////
+func (nr NumberRange[P]) IsPoint() bool {
+	return IsPoint[P, NumberRange[P]](nr)
+}
 func (nr NumberRange[P]) String() string {
 	return RngToStr[P, NumberRange[P]](nr, v2s[P])
 }
-
+func (nr NumberRange[P]) Equal(other NumberRange[P]) bool {
+	return Equal[P, NumberRange[P]](nr, other)
+}
 func (nr NumberRange[P]) IsIntersected(other NumberRange[P]) bool {
-	var rgThis Range[P, NumberRange[P]] = nr
-	var rgOther Range[P, NumberRange[P]] = other
-	return IsIntersected(rgThis, rgOther)
+	return IsIntersected[P, NumberRange[P]](nr, other)
 }
 
 func (nr NumberRange[P]) Intersect(other NumberRange[P]) (bool, NumberRange[P]) {
-	var rgThis Range[P, NumberRange[P]] = nr
-	var rgOther Range[P, NumberRange[P]] = other
-	return Intersect(rgThis, rgOther)
+	return Intersect[P, NumberRange[P]](nr, other)
 }
 
 func (nr NumberRange[P]) IntersectOthers(others []NumberRange[P]) (bool, NumberRange[P]) {
-
-	var rgThis Range[P, NumberRange[P]] = nr
-	return IntersectOthers(rgThis, others)
+	return IntersectOthers[P, NumberRange[P]](nr, others)
 }
 
 func (nr NumberRange[P]) Union(other NumberRange[P]) (bool, NumberRange[P]) {
-	var rgThis Range[P, NumberRange[P]] = nr
-	var rgOther Range[P, NumberRange[P]] = other
-	return Union(rgThis, rgOther)
+	return Union[P, NumberRange[P]](nr, other)
 }
 
 func (nr NumberRange[P]) UnionOthers(others []NumberRange[P]) (bool, NumberRange[P]) {
-	var rgThis Range[P, NumberRange[P]] = nr
-	return UnionOthers(rgThis, others)
+	return UnionOthers[P, NumberRange[P]](nr, others)
 
 }
+func (nr NumberRange[P]) Except(other NumberRange[P]) (r1, r2 NumberRange[P]) {
+	return Except[P, NumberRange[P]](nr, other)
+}
 func (nr NumberRange[P]) IsBefore(other NumberRange[P]) bool {
-	var rgThis Range[P, NumberRange[P]] = nr
-	var rgOther Range[P, NumberRange[P]] = other
-	return IsBefore(rgThis, rgOther)
+	return IsBefore[P, NumberRange[P]](nr, other)
 }
 func (nr NumberRange[P]) IsAfter(other NumberRange[P]) bool {
-	var rgThis Range[P, NumberRange[P]] = nr
-	var rgOther Range[P, NumberRange[P]] = other
-	return IsAfter(rgThis, rgOther)
+
+	return IsAfter[P, NumberRange[P]](nr, other)
 }

@@ -17,12 +17,14 @@ func (tintvl TimeInterval) String() string
 所以，定义若干函数来操作TimeInterval
 **/
 // Tintvl2Str函数使用格式"YYYY-MM-DD hh:mm:ss" 来格式化时间段的起止时间
+
 func Tintvl2Str(ti TimeInterval) string {
 	var layout = "2006-01-02 15:04:05"
 	return FmtTintvl(ti, layout)
 }
 
 // FmtTintvl函数使用给定的格式参数layout来格式化时间段的起止时间
+
 func FmtTintvl(ti TimeInterval, layout string) string {
 	var f = func(t time.Time) string {
 		return t.Format(layout)
