@@ -1,5 +1,5 @@
 /**
-ranges包抽象了所有由起点和终点（不包括在内）所构成的左闭右开区间—— Range[P comparable, R any] interface {...}
+ranges包抽象了所有由起点和终点（不包括在内）所构成的左闭右开区间—— 形如[Pstart, Pend)
 任何具体类型，只要实现了如下几个简单的方法：
     //Range方法用给定的起点与终点创建一个新的Range
      Range(start, end P) R
