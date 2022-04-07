@@ -92,6 +92,7 @@ type Range[P comparable, R any] interface {
 	IsAfter(other R) bool
 }
 
+
 //typeTo函数将给定源类型S的值s，转换目标类型D的值。
 //由于range包中，需要转换的两个参数类型实际应用中都会被赋予相同的类型，所以使用typeTo是安全的。
 //此方法仅用于ranges包内部使用。
