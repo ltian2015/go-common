@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"com.example/common/cycle"
@@ -12,9 +13,7 @@ func main() {
 	var int32Rng ranges.NumberRange[int32] = ranges.CreateNumberRange[int32](1, 43)
 	println(floatRng.String())
 	println(int32Rng.String())
-	var t1 time.Time = time.Now()
-	var a = time.Hour
-	t1.Add(a)
+
 	var intCycle = ranges.NumCycle[int32]{Count: 10, Unit: 1}
 	f := &ranges.NRCycleFunc[int32]{}
 	var cc = cycle.NewCycleCalculator[ranges.NumberRange[int32], ranges.NumCycle[int32]](int32Rng, intCycle, f)
@@ -39,9 +38,25 @@ func main() {
 	println(intRng.String())
 	f5 := &ranges.NRCycleFunc[int]{}
 	var c4 = cycle.NewCycleCalculator[ranges.NumberRange[int], ranges.NumCycle[int]](intRng, intCycle2, f5)
-	for i = 0; i < 10000; i++ {
+	for i = 0; i < 10; i++ {
 		_, r := c4.Next()
-		println(r.String())
+		//println(r.String())
+		_ = r
 	}
-
+	const TIME_LAYOUT = "2006-01-02 15:04:05"
+	var t1, _ = time.Parse(TIME_LAYOUT, "2022-01-01 00:00:00")
+	var tc = ranges.TimeCycle{Count: 15, Unit: 1 * time.Minute}
+	var tpcc = cycle.NewCycleCalculator[time.Time, ranges.TimeCycle](t1, tc, &ranges.TPCycleFunc{})
+	var _, t2 = tpcc.Next()
+	var ti1 ranges.TimeInterval = ranges.CreateTimeInterval(t1, t2)
+	var ticc = cycle.NewCycleCalculator[ranges.TimeInterval, ranges.TimeCycle](ti1, tc, &ranges.TICycleFunc{})
+	//fmt.Println(ti1.String())
+	for i = 0; i < 96; i++ {
+		_, ti := ticc.Pre()
+		fmt.Println(ti.String())
+	}
+	//ticc.Reset()
+	println("-----------------------")
+	curIndex, curValue := ticc.Current()
+	println(curIndex, " - ", curValue.String())
 }
