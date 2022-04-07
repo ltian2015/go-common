@@ -83,32 +83,35 @@ func (nr NumberRange[P]) IsAfter(other NumberRange[P]) bool {
 	return IsAfter[P, NumberRange[P]](nr, other)
 }
 
-////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 type NumCycle[P number] struct {
 	Count int
 	Unit  P
 }
 
-func (ns NumCycle[P]) GetCount() int {
-	return ns.Count
+func (nc NumCycle[P]) GetCount() int {
+	return nc.Count
 }
-func (ns NumCycle[P]) GetUnit() P {
-	return ns.Unit
+func (nc NumCycle[P]) GetUnit() P {
+	return nc.Unit
 }
 
+//
 type NRCycleFunc[P number] struct{}
 
 func (nc *NRCycleFunc[P]) OfCycles(t NumberRange[P], n int, c NumCycle[P]) NumberRange[P] {
 	rStart, rEnd := t.DeRange()
-	start := rStart + P(n)*P(c.Count)*c.Unit
-	end := rEnd + P(n)*P(c.Count)*c.Unit
+	var mount = P(n) * P(c.Count) * c.Unit
+	start := rStart + mount
+	end := rEnd + mount
 	return t.Range(start, end)
 }
 
+//
 type NPCycleFunc[P number] struct{}
 
 func (nc *NPCycleFunc[P]) OfCycles(t P, n int, c NumCycle[P]) P {
 	result := t + P(n)*P(c.Count)*c.Unit
 	return result
-}
+} //
